@@ -40,12 +40,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:ital,wght@0,100..700;1,100..700&display=swap');
 
 .img_container img {
-  /* position: relative; */
   display: flex;
   object-fit: contain;
   width: 100px;
   height: 100px;
   scale: 1.8;
-  /* border: 1px solid #61dafb; */
-  /* margin: 5px; */
 }
