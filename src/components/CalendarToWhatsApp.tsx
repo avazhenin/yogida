@@ -69,6 +69,7 @@ export const CalendarToWhatsapp: React.FC<ICalendarToWhatsapp> = (props) => {
                   <input id='subject1' placeholder='ФИО клиента' onChange={() => copyImageToClipboard()} />
                   <input id='subject2' placeholder='Тип абонемента' />
                   <input id='subject2' placeholder='Локация' />
+                  <input id='subject2' placeholder='Время' />
                 </div>
               </div>
             </div>
