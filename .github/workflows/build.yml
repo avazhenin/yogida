@@ -1,0 +1,36 @@
+name: Deploy to Linode
+
+on:
+  push:
+    branches:
+      - main  # Set this to your default branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Log in to Docker Hub
+      uses: docker/login-action@v1
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+
+    - name: Build and push Docker image using docker-compose
+      run: |
+        docker-compose -f ./yogida/docker-compose.yml build
+        docker-compose -f ./yogida/docker-compose.yml push
+
+    - name: SSH and deploy to Linode using docker-compose
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.LINODE_IP }}
+        username: ${{ secrets.LINODE_USERNAME }}
+        key: ${{ secrets.LINODE_SSH_KEY }}
+        script: |
+          cd /path/to/docker-compose
+          docker-compose pull yogida
+          docker-compose down
+          docker-compose up -d yogida
