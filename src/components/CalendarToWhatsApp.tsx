@@ -57,16 +57,19 @@ export const CalendarToWhatsapp: React.FC<ICalendarToWhatsapp> = (props) => {
   return (
     <div id='container' className='CalendarToWhatsapp'>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: 50 }}>
-        <div id='calendar' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: 1 }}>
+        <div id='calendar' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: 1}}>
           <div>
-            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%' }}>
-              <div className='img_container'><img src={logo} /></div>
+            <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', width: '100%', paddingBottom: 5 }}>
+              <div className='img_container' style={{ textAlign: 'center' }}><img src={logo} /><span>Yogida</span></div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: 10, width: '100%' }}>
                 <div style={{ display: 'flex', flexDirection: 'column' }}>
                   <label htmlFor='fio' style={{ fontSize: 18, fontFamily: "Roboto Mono", textAlign: 'center' }}>Йога для начинающих</label>
                 </div>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 5 }}>
-                  <input id='subject' placeholder='ФИО клиента' onChange={() => copyImageToClipboard()} />
+                  <input id='subject1' placeholder='ФИО клиента' onChange={() => copyImageToClipboard()} />
+                  <input id='subject2' placeholder='Тип абонемента' />
+                  <input id='subject2' placeholder='Локация' />
+                  <input id='subject2' placeholder='Время' />
                 </div>
               </div>
             </div>
