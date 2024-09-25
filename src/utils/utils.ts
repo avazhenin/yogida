@@ -11,3 +11,5 @@ export const copyImageToClipboardFnc = async () => {
     }
   }
 }
+
+export const getImageBlob = async () => await htmlToImage.toBlob(document.getElementById('calendar')!, { backgroundColor: 'white' });

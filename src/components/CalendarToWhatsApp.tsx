@@ -1,12 +1,14 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 
 import DatePicker, { registerLocale } from "react-datepicker";
-import "react-datepicker/dist/react-datepicker.css";
-
+import 'react-datepicker/dist/react-datepicker.css';
+import './style/index.css'
 import { ru } from 'date-fns/locale/ru'
-import { WhatsAppModal } from '../modals/WhatsAppModal'
-import { copyImageToClipboardFnc } from '../utils';
-import _ from 'lodash';
+import { Modal } from '../modals/Modal'
+import { copyImageToClipboardFnc, getImageBlob } from '../utils';
+import _, { debounce } from 'lodash';
+import { SCREEN_SIZE_SHOW_PICTURE } from './constants';
+import { WhatsAppModal } from './WhatsAppModal';
 
 registerLocale('ru', ru);
 
@@ -21,18 +23,39 @@ export const CalendarToWhatsapp: React.FC<ICalendarToWhatsapp> = (props) => {
 
   const [dates, setDates] = useState<Date[]>([]);
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [isBlobModalOpen, setIsBlobModalOpen] = useState<boolean>(false);
+  const [screenWidth, setScreenWidth] = useState(document.body.getBoundingClientRect().width);
+  const [imgBlob, setImgBlob] = useState<Blob | null>();
+
+
+  const getWindowDimensions = () => {
+    const rect = document.body.getBoundingClientRect();
+    setScreenWidth(rect.width);
+  }
+
+  const getWindowDimensionsDebounce = debounce(getWindowDimensions, 500);
 
   useEffect(() => {
-    copyImageToClipboard();
+    window.addEventListener('resize', getWindowDimensionsDebounce);
     return () => {
-      copyImageToClipboard.cancel();
+      window.removeEventListener('resize', getWindowDimensionsDebounce);
     }
+  }, [])
+
+  const processImage = async () => {
+    copyImageToClipboard();
+    setImgBlob(await getImageBlob());
+  };
+
+  useEffect(() => {
+    processImage();
+    return () => copyImageToClipboard.cancel();
   }, [dates])
 
-  const openModal = () => setIsModalOpen(true);
+  const needShowBlobImg = useMemo(() => screenWidth <= SCREEN_SIZE_SHOW_PICTURE && imgBlob != null && imgBlob != undefined, [screenWidth, imgBlob])
 
   return (
-    <div id='container' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
+    <div id='container' className='CalendarToWhatsapp'>
       <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', margin: 50 }}>
         <div id='calendar' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', padding: 1 }}>
           <div>
@@ -47,31 +70,35 @@ export const CalendarToWhatsapp: React.FC<ICalendarToWhatsapp> = (props) => {
                 </div>
               </div>
             </div>
-            <DatePicker
-              inline
-              locale={ru}
-              selectsMultiple
-              selectedDates={dates}
-              selectsRange
-              monthsShown={2}
-              disabledKeyboardNavigation
-              onChange={dates => dates.forEach(date => {
-                if (date) setDates(prev => {
-                  return prev.find(d => d.getTime() === date.getTime()) ? prev.filter(d => d.getTime() !== date.getTime()) : prev.concat(date);
-                })
-              })}
-            />
+            {!isModalOpen && !isBlobModalOpen && (
+              <DatePicker
+                inline
+                locale={ru}
+                selectsMultiple
+                selectedDates={dates}
+                selectsRange
+                monthsShown={2}
+                disabledKeyboardNavigation
+                onChange={dates => dates.forEach(date => {
+                  if (date) setDates(prev => {
+                    return prev.find(d => d.getTime() === date.getTime()) ? prev.filter(d => d.getTime() !== date.getTime()) : prev.concat(date);
+                  })
+                })}
+              />
+            )}
           </div>
         </div>
       </div>
       <button tabIndex={0} style={{ padding: 10 }} onKeyDown={e => {
         if (e.key === 'Enter') {
-          openModal();
+          setIsModalOpen(true);
         }
-      }} onClick={openModal}>
+      }} onClick={() => {
+        if (needShowBlobImg) setIsBlobModalOpen(true); else setIsModalOpen(true);
+      }}>
         Отправить на whatsapp
       </button>
-      <WhatsAppModal
+      <Modal
         isOpen={isModalOpen}
         shouldCloseOnOverlayClick
         onRequestClose={() => setIsModalOpen(false)}
@@ -90,8 +117,16 @@ export const CalendarToWhatsapp: React.FC<ICalendarToWhatsapp> = (props) => {
             justifyContent: 'center',
             border: '1px solid blue'
           }
-        }}
-      />
+        }}>
+        <WhatsAppModal />
+      </Modal>
+      <Modal closeModal={() => setIsModalOpen(false)} onRequestClose={() => setIsBlobModalOpen(false)} isOpen={isBlobModalOpen}>
+        {screenWidth <= SCREEN_SIZE_SHOW_PICTURE && imgBlob != null && imgBlob != undefined && (
+          <div className='blobModal' style={{ position: 'relative' }}>
+            <img src={URL.createObjectURL(imgBlob)} />
+          </div>
+        )}
+      </Modal>
     </div>
   )
 }
