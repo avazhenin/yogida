@@ -34,4 +34,4 @@ jobs:
           docker pull vazhenina/yogida:latest
           docker stop yogida || true
           docker rm yogida || true
-          docker run -d --name yogida -p 3000:3000 vazhenina/yogida:latest
+          docker run -d --name yogida -p 8888:8888 vazhenina/yogida:latest
