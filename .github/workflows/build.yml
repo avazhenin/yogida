@@ -30,6 +30,7 @@ jobs:
         username: ${{ secrets.LINODE_USERNAME }}
         key: ${{ secrets.LINODE_SSH_KEY }}
         script: |
-          docker-compose pull yogida
-          docker-compose down
-          docker-compose up -d yogida
+          docker pull vazhenina/yogida:latest
+          docker stop yogida || true
+          docker rm yogida || true
+          docker run -d --name yogida -p 3000:3000 vazhenina/yogida:latest
