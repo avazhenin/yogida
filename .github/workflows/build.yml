@@ -20,8 +20,8 @@ jobs:
 
     - name: Build and push Docker image using docker-compose
       run: |
-        docker compose -f ./yogida/docker-compose.yml build
-        docker compose -f ./yogida/docker-compose.yml push
+        docker compose -f ../../docker-compose.yml build
+        docker compose -f ../../docker-compose.yml push
 
     - name: SSH and deploy to Linode using docker-compose
       uses: appleboy/ssh-action@master
