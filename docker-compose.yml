@@ -1,0 +1,7 @@
+services:
+  yogida-web:
+    container_name: yogida-web
+    build: 
+      dockerfile: Dockerfile
+    ports:
+      - "8888:8888"
